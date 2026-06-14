@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIRAIZU - Dashboard SPK Magang Jepang</title>
+    
+    <!-- Bootstrap 5 CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Google Fonts Premium -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+           1. VARIABLE & BASE STYLES
+           ========================================================================== */
+        :root {
+            --primary-bg: #05060A;       
+            --accent-pink: #FF2E93;      
+            --accent-indigo: #6366F1;    
+            
+            --card-glass: rgba(13, 15, 24, 0.7); 
+            --border-glass: rgba(255, 255, 255, 0.04);
+            --pink-glow: rgba(255, 46, 147, 0.03); 
+            
+            --text-main: #F3F4F6;
+            --text-muted: #9CA3AF;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            position: relative;
+            padding-top: 110px; /* Jarak aman agar hero tidak tertutup header fixed */
+        }
+
+        /* Ambient Light Background */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 800px;
+            height: 600px;
+            top: -150px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: radial-gradient(circle, rgba(255, 46, 147, 0.08) 0%, rgba(99, 102, 241, 0.03) 50%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* ==========================================================================
+           2. HEADER FIXED / NAVBAR (MENTOK KIRI-KANAN SESUAI GRID)
+           ========================================================================== */
+        header {
+            width: 100%;
+            padding: 1.2rem 0;
+            border-bottom: 1px solid var(--border-glass);
+            background: rgba(5, 6, 10, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        /* Mengondisikan pembungkus agar sejajar sempurna dengan grid kiri-kanan */
+        .header-container {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .brand-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        /* Kanji: Putih Bersih, Sakral, Kontras Tinggi */
+        .logo-kanji {
+            font-family: 'Space Grotesk', 'MS Gothic', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #ffffff; 
+            letter-spacing: 2px;
+            padding-right: 14px;
+            border-right: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .text-stack {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Romaji MIRAIZU: Menggunakan Gradasi Cyber-Sakura Premium */
+        .logo-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: 1.5px;
+            background: linear-gradient(135deg, var(--accent-pink), #FFBE98);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-sub {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        /* Badge Metode: Memastikan Latar Belakang Gelap Transparan & Tulisan Putih Terbaca */
+        .badge-method {
+            font-size: 0.75rem; 
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            color: var(--text-main) !important; 
+            background-color: rgba(255, 255, 255, 0.03) !important; 
+            border: 1px solid rgba(255, 46, 147, 0.25) !important; 
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+
+        .badge-method:hover {
+            border-color: var(--accent-pink) !important;
+            background-color: rgba(255, 46, 147, 0.05) !important;
+        }
+
+        /* ==========================================================================
+           3. HERO TITLE & TYPOGRAPHY
+           ========================================================================== */
+        .hero-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2.5rem, 4.5vw, 4rem);
+            line-height: 1.15;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-title .white {
+            color: #ffffff;
+        }
+
+        .hero-title .gradient {
+            background: linear-gradient(135deg, var(--accent-pink) 30%, #FFBE98 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* ==========================================================================
+           4. GLASS CARD SYSTEM
+           ========================================================================== */
+        .glass-card {
+            background: var(--card-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px -10px var(--pink-glow);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -5px rgba(255, 46, 147, 0.12);
+            border-color: rgba(255, 46, 147, 0.25);
+        }
+
+        /* ==========================================================================
+           5. BADGES & INTERACTIVE LINKS
+           ========================================================================== */
+        .badge-interactive {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-muted);
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            letter-spacing: 0.03em;
+            border: 1px solid var(--border-glass);
+            transition: all 0.3s ease;
+        }
+
+        .badge-interactive:hover {
+            color: var(--text-main);
+            border-color: rgba(255, 46, 147, 0.3);
+            background: rgba(255, 46, 147, 0.02);
+        }
+
+        .estat-link {
+            color: #22d3ee;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .estat-link:hover {
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(34, 211, 238, 0.8);
+        }
+
+        /* ==========================================================================
+           6. WORKFLOW & CONTENT
+           ========================================================================== */
+        .workflow-num {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.7rem;
+            background: rgba(255, 46, 147, 0.1);
+            color: var(--accent-pink);
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            width: fit-content;
+            border: 1px solid rgba(255, 46, 147, 0.15);
+        }
+
+        .methodology-box {
+            background: linear-gradient(180deg, rgba(255, 46, 147, 0.03) 0%, rgba(5, 6, 10, 0) 100%);
+            border-left: 3px solid var(--accent-pink) !important;
+        }
+
+        .dot-pulse {
+            width: 8px;
+            height: 8px;
+            background-color: #10B981; 
+            border-radius: 50%;
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* ==========================================================================
+           7. CTA BUTTON
+           ========================================================================== */
+        .btn-spk {
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-indigo));
+            color: #ffffff;
+            border-radius: 50px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 30px rgba(255, 46, 147, 0.2);
+        }
+
+        .btn-spk:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(255, 46, 147, 0.4);
+            color: #ffffff;
+            letter-spacing: 0.08em;
+        }
+        
+        .text-pink { color: var(--accent-pink); }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR FIXED (SUDAH PRESISI DAN MEMILIKI IDENTITAS JEPANG MINIMALIS MODERN) -->
+    <header>
+        <div class="container header-container d-flex justify-content-between align-items-center">
+            <!-- Sisi Kiri: Kanji Putih + Teks Vertikal Bertumpuk -->
+            <div class="brand-wrapper">
+                <div class="logo-kanji">未来図</div>
+                <div class="text-stack">
+                    <span class="logo-title">MIRAIZU</span>
+                    <span class="logo-sub">Decision Support System</span>
+                </div>
+            </div>
+            
+            <!-- Sisi Kanan: Badge Metode dengan Keterbacaan yang Diperbaiki -->
+            <div class="badge-method text-uppercase fw-semibold">
+                Metode MFEP & SAW
+            </div>
+        </div>
+    </header>
+
+    <div class="container py-4">
+
+        <!-- ================= HERO SECTION ================= -->
+        <div class="text-center mb-5 mt-4">
+            <div class="d-inline-flex align-items-center gap-2 px-4 py-2 rounded-pill glass-card mb-4">
+                <span class="dot-pulse"></span>
+                <span class="text-white small fw-bold text-uppercase" style="letter-spacing:0.12em; font-size: 0.75rem;">
+                    E-STAT Japan Official Database Connected
+                </span>
+            </div>
+
+            <h1 class="hero-title">
+                <span class="white">Rancang Langkah ke Jepang</span><br />
+                <span class="gradient">Berdasarkan Peta Data Akurat</span>
+            </h1>
+
+            <p class="text-white-50 fs-5 mx-auto mb-4" style="max-width: 820px; font-weight: 400; line-height: 1.6;">
+                Sistem Pendukung Keputusan yang mengombinasikan analisis kesiapan personal mahasiswa dan pengolahan data makroskopis dari portal statistik resmi Pemerintah Jepang.
+            </p>
+
+            <a href="https://www.e-stat.go.jp/en" target="_blank" class="estat-link small">
+                Sumber Data Resmi: Portal Statistics of Japan (e-Stat) <i class="bi bi-box-arrow-up-right"></i>
+            </a>
+        </div>
+
+        <!-- ================= ARCHITECTURE WORKFLOW ================= -->
+        <div class="row g-4 mb-5 pt-2">
+            <div class="col-12 d-flex align-items-center mb-2">
+                <h6 class="text-white fw-bold m-0 text-uppercase" style="letter-spacing:0.15em; font-size: 0.8rem;">
+                    <i class="bi bi-cpu me-2 text-pink"></i> Alur Analisis Rekomendasi
+                </h6>
+                <div class="flex-grow-1 ms-3 border-top border-white border-opacity-10"></div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="glass-card p-4">
+                    <div class="workflow-num mb-3">PHASE 01</div>
+                    <i class="bi bi-shield-lock text-white fs-3 mb-3 d-block"></i>
+                    <h6 class="text-white fw-bold mb-2">Biodata Pengguna</h6>
+                    <p class="small text-white-50 mb-0" style="line-height:1.6;">
+                        Sinkronisasi profil akademik, kompetensi, dan preferensi awal wilayah kerja.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="glass-card p-4">
+                    <div class="workflow-num mb-3">PHASE 02</div>
+                    <i class="bi bi-sliders2-vertical text-white fs-3 mb-3 d-block"></i>
+                    <h6 class="text-white fw-bold mb-2">Kuesioner Kesiapan</h6>
+                    <p class="small text-white-50 mb-0" style="line-height:1.6;">
+                        Evaluasi tingkat adaptabilitas bahasa, pemahaman budaya, psikologi, dan finansial.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="glass-card p-4">
+                    <div class="workflow-num mb-3">PHASE 03</div>
+                    <i class="bi bi-database-fill-down text-white fs-3 mb-3 d-block"></i>
+                    <h6 class="text-white fw-bold mb-2">Analisis Dataset</h6>
+                    <p class="small text-white-50 mb-0" style="line-height:1.6;">
+                        Komparasi real-data e-Stat mencakup upah minimum, biaya hidup, sewa, dan peluang kerja.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="glass-card p-4">
+                    <div class="workflow-num mb-3">PHASE 04</div>
+                    <i class="bi bi-trophy text-white fs-3 mb-3 d-block"></i>
+                    <h6 class="text-white fw-bold mb-2">Hasil Rekomendasi</h6>
+                    <p class="small text-white-50 mb-0" style="line-height:1.6;">
+                        Integrasi perhitungan MFEP & SAW menghasilkan urutan prefektur paling optimal.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= DATA METODOLOGI CONTENT ================= -->
+        <div class="row g-4 mb-5">
+            <div class="col-lg-7">
+                <div class="glass-card p-4 p-md-5 methodology-box h-100">
+                    <h3 class="text-white fw-bold mb-3" style="font-family: 'Space Grotesk', sans-serif;">Bobot Keputusan Transparan</h3>
+                    <p class="text-white-50 mb-4" style="text-align: justify; line-height:1.8; font-size: 0.95rem;">
+                        Berbeda dengan sistem rekomendasi subjektif, MIRAIZU memproses pencocokan menggunakan perhitungan matriks normalisasi. Setiap data prefektur dihitung secara adil berdasarkan parameter kriteria keuntungan (<em>Benefit</em>) dan beban (<em>Cost</em>) untuk meminimalkan risiko salah penempatan.
+                    </p>
+
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge-interactive">Benefit-Cost Analysis</span>
+                        <span class="badge-interactive">Multi-Factor Evaluation</span>
+                        <span class="badge-interactive">Simple Additive Weighting</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="glass-card p-4 p-md-5 h-100">
+                    <h4 class="text-white fw-bold mb-4" style="font-family: 'Space Grotesk', sans-serif;">Keunggulan Sistem</h4>
+
+                    <div class="d-flex mb-4">
+                        <i class="bi bi-check2-circle text-pink fs-4 me-3"></i>
+                        <div>
+                            <h6 class="text-white mb-1">Objektivitas Mutlak</h6>
+                            <p class="small text-white-50 m-0">
+                                Keputusan murni dari data empiris, menghindari bias popularitas kota besar semata (seperti Tokyo/Osaka).
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex mb-4">
+                        <i class="bi bi-lightning-charge text-pink fs-4 me-3"></i>
+                        <div>
+                            <h6 class="text-white mb-1">Kalkulasi Instan</h6>
+                            <p class="small text-white-50 m-0">
+                                Mengintegrasikan penilaian kuesioner dengan ribuan baris data e-Stat secara cepat.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex">
+                        <i class="bi bi-eye text-pink fs-4 me-3"></i>
+                        <div>
+                            <h6 class="text-white mb-1">Komparasi Interaktif</h6>
+                            <p class="small text-white-50 m-0">
+                                Menyajikan visualisasi grafik makro prefektur untuk kenyamanan analisis mahasiswa.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= CALL TO ACTION ================= -->
+        <div class="text-center py-4">
+            <a href="biodata.html" class="btn-spk btn-lg px-5 py-3 fs-6">
+                Mulai Analisis Sekarang <i class="bi bi-rocket-takeoff ms-2"></i>
+            </a>
+            <p class="text-white-50 small mt-3">
+                Estimasi waktu pengisian data: 3–5 menit
+            </p>
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="text-center py-4 mt-5 text-white-50 border-top border-white border-opacity-5" style="font-size: 0.8rem;">
+        &copy; 2026 MIRAIZU • Sekolah Tinggi Teknologi Cipasung. Diperkuat oleh Official Statistics of Japan.
+    </footer>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

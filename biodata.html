@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIRAIZU - Biodata Pengguna</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+           1. VARIABLE & BASE STYLES (KONSISTEN DENGAN BERANDA)
+           ========================================================================== */
+        :root {
+            --primary-bg: #05060A;       
+            --accent-pink: #FF2E93;      
+            --accent-indigo: #6366F1;    
+            
+            --card-glass: rgba(13, 15, 24, 0.7); 
+            --border-glass: rgba(255, 255, 255, 0.04);
+            --pink-glow: rgba(255, 46, 147, 0.03); 
+            
+            --text-main: #F3F4F6;
+            --text-muted: #9CA3AF;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            position: relative;
+            padding-top: 110px; /* Jarak aman dari fixed header */
+        }
+
+        /* Ambient Light Background (Sama dengan Beranda) */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 800px;
+            height: 600px;
+            top: -150px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: radial-gradient(circle, rgba(255, 46, 147, 0.08) 0%, rgba(99, 102, 241, 0.03) 50%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* ==========================================================================
+           2. HEADER FIXED / NAVBAR (KONSISTEN DENGAN BERANDA)
+           ========================================================================== */
+        header {
+            width: 100%;
+            padding: 1.2rem 0;
+            border-bottom: 1px solid var(--border-glass);
+            background: rgba(5, 6, 10, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .brand-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo-kanji {
+            font-family: 'Space Grotesk', 'MS Gothic', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #ffffff; 
+            letter-spacing: 2px;
+            padding-right: 14px;
+            border-right: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .text-stack {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .logo-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: 1.5px;
+            background: linear-gradient(135deg, var(--accent-pink), #FFBE98);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-sub {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        /* Badge Metode / Indikator Tahap (KONSISTEN DENGAN BERANDA) */
+        .badge-method {
+            font-size: 0.75rem; 
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            color: var(--text-main) !important; 
+            background-color: rgba(255, 255, 255, 0.03) !important; 
+            border: 1px solid rgba(255, 46, 147, 0.25) !important; 
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+
+        .badge-method:hover {
+            border-color: var(--accent-pink) !important;
+            background-color: rgba(255, 46, 147, 0.05) !important;
+        }
+
+        /* ==========================================================================
+           3. GLASS CARD SYSTEM (KONSISTEN DENGAN BERANDA)
+           ========================================================================== */
+        .glass-card {
+            background: var(--card-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px -10px var(--pink-glow);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* ==========================================================================
+           4. FORM ELEMEN STYLES (PREMIUM DARK UTILITY)
+           ========================================================================== */
+        .form-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            color: #E5E7EB;
+            margin-bottom: 0.6rem;
+        }
+
+        .form-control, .form-select {
+            background-color: rgba(255, 255, 255, 0.03) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-radius: 12px;
+            color: #ffffff !important;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .form-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%239CA3AF' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        }
+
+        .form-select option {
+            background-color: #0D0F18;
+            color: #ffffff;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            border-color: rgba(255, 46, 147, 0.4) !important;
+            box-shadow: 0 0 15px rgba(255, 46, 147, 0.15) !important;
+            outline: none;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 0.9rem;
+        }
+
+        .step-indicator {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--accent-pink);
+            letter-spacing: 2px;
+        }
+
+        /* ==========================================================================
+           5. NAVIGASI BUTTONS (PREMIUM STYLE)
+           ========================================================================== */
+        .btn-next {
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-indigo));
+            color: #ffffff;
+            border-radius: 12px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 30px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 20px rgba(255, 46, 147, 0.15);
+        }
+
+        .btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(255, 46, 147, 0.35);
+            color: #ffffff;
+        }
+
+        .btn-back {
+            background-color: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .custom-alert {
+            background: rgba(239, 68, 68, 0.06);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 12px;
+            color: #FCA5A5;
+            font-size: 0.85rem;
+            display: none;
+        }
+
+        .text-pink { color: var(--accent-pink); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-container d-flex justify-content-between align-items-center">
+            <div class="brand-wrapper">
+                <div class="logo-kanji">未来図</div>
+                <div class="text-stack">
+                    <span class="logo-title">MIRAIZU</span>
+                    <span class="logo-sub">Decision Support System</span>
+                </div>
+            </div>
+            
+            <div class="badge-method text-uppercase fw-semibold">
+                Tahap 1 / 3
+            </div>
+        </div>
+    </header>
+
+    <div class="container py-4">
+        <div class="row justify-content-center mt-4">
+            <div class="col-lg-6 col-md-8">
+                
+                <div class="glass-card p-4 p-md-5">
+                    
+                    <div class="text-center mb-4">
+                        <span class="step-indicator text-uppercase">Pengisian Konteks Awal</span>
+                        <h3 class="text-white fw-bold mt-1" style="font-family: 'Space Grotesk', sans-serif;">Biodata Pengguna</h3>
+                        <p class="text-white-50 small m-0">Masukkan data dasar Anda untuk personalisasi matriks kriteria keputusan.</p>
+                    </div>
+
+                    <div id="validationAlert" class="custom-alert p-3 mb-4">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <span id="alertMessage">Harap lengkapi semua data sebelum melanjutkan!</span>
+                        </div>
+                    </div>
+
+                    <form id="biodataForm">
+                        
+                        <div class="mb-4">
+                            <label for="inputNama" class="form-label">
+                                <i class="bi bi-person me-2 text-pink"></i>Nama Lengkap
+                            </label>
+                            <input type="text" class="form-control" id="inputNama" autocomplete="off" placeholder="Contoh: Faisal Muhamad">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="selectPekerjaan" class="form-label">
+                                <i class="bi bi-briefcase me-2 text-pink"></i>Bidang Pekerjaan yang Diminati
+                            </label>
+                            <select class="form-select" id="selectPekerjaan">
+                                <option value="" selected disabled>Pilih bidang pekerjaan...</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-5">
+                            <label for="selectPrefektur" class="form-label">
+                                <i class="bi bi-geo-alt me-2 text-pink"></i>Lokasi Prefektur Tujuan
+                            </label>
+                            <select class="form-select" id="selectPrefektur">
+                                <option value="" selected disabled>Pilih prefektur jepang...</option>
+                            </select>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top border-white border-opacity-5">
+                            <a href="beranda.html" class="btn-back">
+                                <i class="bi bi-arrow-left me-2"></i>Kembali
+                            </a>
+                            <button type="button" id="btnSubmit" class="btn-next">
+                                Lanjut Kuesioner<i class="bi bi-arrow-right ms-2"></i>
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div> </div>
+        </div>
+    </div>
+
+    <footer class="text-center py-4 mt-5 text-white-50 border-top border-white border-opacity-5" style="font-size: 0.8rem;">
+        &copy; 2026 MIRAIZU • Sekolah Tinggi Teknologi Cipasung. Diperkuat oleh Official Statistics of Japan.
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const datasetPekerjaan = [
+            "Housekeeping & Perhotelan",
+            "Food and Beverage Service",
+            "Pengolahan Makanan (Food Processing)",
+            "Manufaktur & Permesinan",
+            "Sektor Pertanian (Agriculture)",
+            "Perawatan Lansia (Careworker)"
+        ];
+
+        const datasetPrefektur = [
+            "Tokyo", "Osaka", "Kyoto", "Kanagawa", "Aichi", 
+            "Fukuoka", "Hokkaido", "Okinawa", "Shizuoka", "Hiroshima"
+        ];
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const selectPekerjaan = document.getElementById("selectPekerjaan");
+            const selectPrefektur = document.getElementById("selectPrefektur");
+
+            datasetPekerjaan.forEach(kerja => {
+                let option = document.createElement("option");
+                option.value = kerja;
+                option.textContent = kerja;
+                selectPekerjaan.appendChild(option);
+            });
+
+            datasetPrefektur.forEach(kota => {
+                let option = document.createElement("option");
+                option.value = kota;
+                option.textContent = kota;
+                selectPrefektur.appendChild(option);
+            });
+        });
+
+        document.getElementById("btnSubmit").addEventListener("click", function() {
+            const nama = document.getElementById("inputNama").value.trim();
+            const pekerjaan = document.getElementById("selectPekerjaan").value;
+            const prefektur = document.getElementById("selectPrefektur").value;
+            
+            const alertBox = document.getElementById("validationAlert");
+
+            if (nama === "" || pekerjaan === "" || prefektur === "") {
+                alertBox.style.display = "block"; 
+                window.scrollTo({ top: 0, behavior: 'smooth' }); 
+            } else {
+                alertBox.style.display = "none";
+                
+                localStorage.setItem("miraizu_nama", nama);
+                localStorage.setItem("miraizu_pekerjaan", pekerjaan);
+                localStorage.setItem("miraizu_prefektur", prefektur);
+
+                window.location.href = "kuesioner.html"; 
+            }
+        });
+    </script>
+</body>
+</html>

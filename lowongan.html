@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIRAIZU - Analisis Dataset Rasio Lowongan Kerja</title>
+    
+    <!-- Bootstrap 5 CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Google Fonts Premium -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- Chart.js CDN via jsDelivr -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* ==========================================================================
+           1. VARIABLE & BASE STYLES
+           ========================================================================== */
+        :root {
+            --primary-bg: #05060A;       
+            --accent-pink: #FF2E93;      
+            --accent-indigo: #6366F1;    
+            --accent-cyan: #22D3EE;
+            --accent-emerald: #10B981;
+            
+            --card-glass: rgba(13, 15, 24, 0.7); 
+            --border-glass: rgba(255, 255, 255, 0.04);
+            --pink-glow: rgba(255, 46, 147, 0.03); 
+            
+            --text-main: #F3F4F6;
+            --text-muted: #9CA3AF;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            position: relative;
+            padding-top: 110px;
+        }
+
+        /* Ambient Light Glow Background (Emerald/Cyan Shift untuk Kriteria Keuntungan/Benefit) */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 900px;
+            height: 600px;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.04) 0%, rgba(34, 211, 238, 0.01) 60%, transparent 80%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* ==========================================================================
+           2. HEADER FIXED / NAVBAR
+           ========================================================================== */
+        header {
+            width: 100%;
+            padding: 1.2rem 0;
+            border-bottom: 1px solid var(--border-glass);
+            background: rgba(5, 6, 10, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            width: 100%;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .brand-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo-kanji {
+            font-family: 'Space Grotesk', 'MS Gothic', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #ffffff; 
+            letter-spacing: 2px;
+            padding-right: 14px;
+            border-right: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .text-stack {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .logo-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: 1.5px;
+            background: linear-gradient(135deg, var(--accent-pink), #FFBE98);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-sub {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        .badge-method {
+            font-size: 0.75rem; 
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            color: var(--text-main) !important; 
+            background-color: rgba(255, 255, 255, 0.03) !important; 
+            border: 1px solid rgba(16, 185, 129, 0.25) !important; 
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+        }
+
+        /* ==========================================================================
+           3. WIDESCREEN GLASS CARD & GRID LAYOUT
+           ========================================================================== */
+        .widescreen-wrapper {
+            width: 100%;
+            max-width: 1440px; 
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .glass-card {
+            background: var(--card-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            box-shadow: 0 15px 45px -10px var(--pink-glow);
+        }
+
+        .step-indicator {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--accent-emerald);
+            letter-spacing: 2px;
+        }
+
+        /* Container Grafik */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 460px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        /* Card Informasi Peluang Kerja (Highlight Emerald) */
+        .ratio-info-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.04) 0%, rgba(5, 6, 10, 0.2) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.15);
+            border-left: 5px solid var(--accent-emerald);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .ratio-amount {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.1;
+        }
+
+        .ratio-unit {
+            font-size: 0.88rem;
+            color: var(--accent-cyan);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* Card Pembanding Basis Data */
+        .comparison-info-card {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-left: 5px solid var(--accent-indigo);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        /* Interpretive Description Box */
+        .interpretation-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 1.5rem;
+            line-height: 1.7;
+            font-size: 0.9rem;
+        }
+
+        /* ==========================================================================
+           4. NAVIGATION BUTTONS
+           ========================================================================== */
+        .btn-next {
+            background: linear-gradient(135deg, var(--accent-emerald), var(--accent-indigo));
+            color: #ffffff;
+            border-radius: 12px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 14px 32px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.15);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.35);
+            color: #ffffff;
+        }
+
+        .btn-back {
+            background-color: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            border-radius: 12px;
+            padding: 14px 26px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR FIXED -->
+    <header>
+        <div class="header-container d-flex justify-content-between align-items-center">
+            <div class="brand-wrapper">
+                <div class="logo-kanji">未来図</div>
+                <div class="text-stack">
+                    <span class="logo-title">MIRAIZU</span>
+                    <span class="logo-sub">Decision Support System</span>
+                </div>
+            </div>
+            
+            <div class="badge-method text-uppercase fw-semibold">
+                Dataset Pasar Kerja
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENT WRAPPER WITH FULL SCREEN CONFIGURATION -->
+    <div class="widescreen-wrapper py-4">
+        
+        <!-- MAIN CARD GLASS -->
+        <div class="glass-card p-4 p-md-5">
+            
+            <!-- HEADER JUDUL DI TENGAH -->
+            <div class="text-center mb-5">
+                <span class="step-indicator text-uppercase">Kriteria Alternatif SAW (4/4)</span>
+                <h2 class="text-white fw-bold mt-1" style="font-family: 'Space Grotesk', sans-serif;">Halaman Analisis Dataset Rasio Lowongan Kerja</h2>
+            </div>
+
+            <!-- TWO-COLUMN WIDE GRID LAYOUT -->
+            <div class="row g-4 gx-lg-5">
+                
+                <!-- KOLOM KIRI: DIAGRAM BATANG -->
+                <div class="col-xl-7 col-lg-6">
+                    <div class="d-flex flex-column h-100">
+                        <h5 class="text-white fw-semibold mb-3" style="font-size: 0.95rem;">
+                            <i class="bi bi-bar-chart-line text-emerald me-2"></i>Grafik Perbandingan Rasio Lowongan Kerja Efektif (Satuan: Kali)
+                        </h5>
+                        <div class="chart-container flex-grow-1">
+                            <canvas id="ratioBarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KOLOM KANAN: DUA CARD HORIZONTAL & BOX INTERPRETASI -->
+                <div class="col-xl-5 col-lg-6">
+                    <div class="d-flex flex-column h-100 justify-content-between gap-4">
+                        
+                        <!-- DUA CARD BERJAJAR HORIZONTAL -->
+                        <div class="row g-3">
+                            <!-- Card 1: Rincian Peluang Prefektur User -->
+                            <div class="col-md-6">
+                                <div class="ratio-info-card h-100 d-flex flex-column justify-content-between">
+                                    <div>
+                                        <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">Prefektur Pilihan</span>
+                                        <h4 class="text-white fw-bold mb-2" id="selectedPrefName">Tokyo</h4>
+                                    </div>
+                                    <div class="mt-3">
+                                        <div class="ratio-amount text-nowrap" id="selectedPrefRatio">0.00</div>
+                                        <div class="text-muted small mb-2">kali lipat jumlah pencari kerja</div>
+                                        <div class="ratio-unit" id="selectedPrefStatus">Memuat...</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card 2: Pembanding Basis Data -->
+                            <div class="col-md-6">
+                                <div class="comparison-info-card h-100 d-flex flex-column justify-content-between">
+                                    <div>
+                                        <h6 class="text-white fw-bold mb-1" style="font-size: 0.9rem;">Pembanding Basis Data</h6>
+                                        <span class="text-uppercase text-cyan fw-bold d-block mb-3" style="font-size: 0.65rem; letter-spacing: 0.5px;">Statistik Dataset</span>
+                                    </div>
+                                    <p class="text-white-50 mb-0" style="font-size: 0.78rem; line-height: 1.6;">
+                                        Membandingkan prefektur minat terhadap seluruh alternatif guna penentuan bobot matriks SAW.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- INTERPRETASI TEPAT DI BAWAH KEDUA CARD -->
+                        <div class="w-100 d-flex flex-column flex-grow-1 justify-content-end">
+                            <h5 class="text-white fw-semibold mb-2" style="font-size: 0.95rem;">
+                                <i class="bi bi-file-earmark-text text-emerald me-2"></i>Interpretasi Hasil Analisis
+                            </h5>
+                            <div class="interpretation-box text-white-50 flex-grow-1" id="interpretationText">
+                                <!-- Diisi secara dinamis melalui JavaScript -->
+                                Memuat analisis kriteria peluang lowongan alternatif...
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div> <!-- End Row Layout -->
+
+            <!-- NAVIGASI SEKUENSIONAL MENUJU PROSES PERANGKINGAN SAW -->
+            <div class="d-flex justify-content-between align-items-center pt-4 mt-5 border-top border-white border-opacity-5">
+                <a href="biayasewa.html" class="btn-back">
+                    <i class="bi bi-arrow-left me-2"></i>Kembali ke Biaya Sewa
+                </a>
+                <a href="rekomendasi.html" class="btn-next">
+                    Hitung Perangkingan Akhir<i class="bi bi-arrow-right ms-2"></i>
+                </a>
+            </div>
+
+        </div> <!-- End Glass Card -->
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="text-center py-4 mt-4 text-white-50 border-top border-white border-opacity-5" style="font-size: 0.8rem;">
+        &copy; 2026 MIRAIZU • Sekolah Tinggi Teknologi Cipasung. Data Analisis Kriteria Hukum Ekonomi Jepang.
+    </footer>
+
+    <!-- LOGIKA DIAGRAM & GENERATOR DATA DINAMIS -->
+    <script>
+        // DATASET RIIL RASIO LOWONGAN KERJA EFEKTIF (Job Openings-to-Applicants Ratio)
+        // Nilai menunjukkan perbandingan ketersediaan loker berbanding jumlah pencari kerja resmi
+        const datasetLowongan = {
+            "Tokyo": 1.45,
+            "Kanagawa": 1.12,
+            "Osaka": 1.24,
+            "Saitama": 1.05,
+            "Aichi": 1.31,
+            "Chiba": 0.98,
+            "Kyoto": 1.18,
+            "Fukuoka": 1.15,
+            "Shizuoka": 1.22,
+            "Hokkaido": 0.92,
+            "Okinawa": 0.81
+        };
+
+        // Mengambil prefektur pilihan dari localStorage biodata sebelumnya
+        let prefekturPilihanUser = localStorage.getItem("miraizu_prefektur_minat") || "Tokyo";
+        
+        if (!datasetLowongan[prefekturPilihanUser]) {
+            prefekturPilihanUser = "Tokyo"; 
+        }
+
+        const ratioUser = datasetLowongan[prefekturPilihanUser];
+
+        // Penentuan status indikator singkat di dalam kartu komponen
+        let statusTeks = "";
+        if (ratioUser >= 1.30) {
+            statusTeks = "Peluang Sangat Terbuka";
+        } else if (ratioUser >= 1.00) {
+            statusTeks = "Peluang Kompetitif Bersahabat";
+        } else {
+            statusTeks = "Tingkat Persaingan Tinggi";
+        }
+
+        // Render data komponen kartu samping kanan
+        document.getElementById("selectedPrefName").innerText = prefekturPilihanUser;
+        document.getElementById("selectedPrefRatio").innerText = ratioUser.toFixed(2) + "x";
+        document.getElementById("selectedPrefStatus").innerText = statusTeks;
+
+        // Inisialisasi Diagram Batang (Chart.js)
+        const labelsPrefektur = Object.keys(datasetLowongan);
+        const dataRatioValues = Object.values(datasetLowongan);
+
+        // Penekanan Visual Warna Khusus (Emerald/Hijau Neon untuk Kriteria Benefit)
+        const backgroundColors = labelsPrefektur.map(label => 
+            label === prefekturPilihanUser ? '#10B981' : 'rgba(99, 102, 241, 0.25)'
+        );
+        const borderColors = labelsPrefektur.map(label => 
+            label === prefekturPilihanUser ? '#10B981' : '#6366F1'
+        );
+
+        const ctx = document.getElementById('ratioBarChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labelsPrefektur,
+                datasets: [{
+                    data: dataRatioValues,
+                    backgroundColor: backgroundColors,
+                    borderColor: borderColors,
+                    borderWidth: 1.5,
+                    borderRadius: 5,
+                    hoverBackgroundColor: '#10B981'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return ` Rasio Peluang: ${context.raw.toFixed(2)} kali lipat`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#9CA3AF', font: { size: 10 } },
+                        suggestedMax: 1.6
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            color: '#F3F4F6',
+                            font: { 
+                                size: 11,
+                                family: 'Plus Jakarta Sans',
+                                weight: function(context) {
+                                    return context.tick && labelsPrefektur[context.index] === prefekturPilihanUser ? '700' : '400';
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // GENERATOR DESKRIPSI INTERPRETASI OTOMATIS BERDASARKAN KRITERIA BENEFIT SAW
+        let interpretasiTeks = "";
+        if (ratioUser >= 1.30) {
+            interpretasiTeks = `Berdasarkan diagram batang di atas, Prefektur <strong class="text-white">${prefekturPilihanUser}</strong> yang Anda pilih memiliki nilai rata-rata rasio lowongan kerja sebesar <strong class="text-emerald">${ratioUser.toFixed(2)} kali</strong>. Nilai ini tergolong <strong class="text-success">Tinggi</strong>, yang bermakna jumlah ketersediaan lapangan pekerjaan jauh lebih banyak dibandingkan jumlah total pencari kerja aktif di wilayah tersebut. Prefektur ini menawarkan peluang kerja yang lebih baik dan probabilitas kelulusan penerimaan program internship yang tinggi bagi Anda karena tingkat penyerapan tenaga kerja yang masif dalam matriks benefit SAW.`;
+        } else if (ratioUser >= 1.00) {
+            interpretasiTeks = `Berdasarkan visualisasi diagram di atas, Prefektur <strong class="text-white">${prefekturPilihanUser}</strong> memiliki rasio lowongan kerja berbanding pelamar sebesar <strong class="text-emerald">${ratioUser.toFixed(2)} kali</strong>. Angka tersebut masuk dalam klasifikasi <strong class="text-info">Stabil/Kompetitif Seimbang</strong>. Kondisi pasar kerja di wilayah ini berada pada titik ekuilibrium yang aman, artinya kesempatan kerja bagi mahasiswa internship tersedia secara proporsional dan memiliki peluang lolos yang cukup bersahabat.`;
+        } else {
+            interpretasiTeks = `Berdasarkan analisis grafik di atas, besaran rasio lowongan kerja untuk wilayah Prefektur <strong class="text-white">${prefekturPilihanUser}</strong> adalah <strong class="text-emerald">${ratioUser.toFixed(2)} kali</strong>. Nilai ini tergolong <strong class="text-warning">Rendah (di bawah 1.0)</strong>, yang mengindikasikan bahwa jumlah pencari kerja di wilayah ini melebihi kuota loker yang dibuka secara umum. Informasi ini menyampaikan bahwa tingkat persaingan pada wilayah tersebut cenderung lebih tinggi, sehingga Anda perlu mempersiapkan kompetensi, bahasa, dan administrasi diri dengan lebih matang untuk menghadapi seleksi internship.`;
+        }
+
+        document.getElementById("interpretationText").innerHTML = interpretasiTeks;
+    </script>
+</body>
+</html>
